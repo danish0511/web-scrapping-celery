@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +38,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_celery_beat",
+    "django_celery_results",
+    "movies",
 ]
 
 MIDDLEWARE = [
@@ -121,3 +125,15 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Save Celery task results in Django's database
+CELERY_RESULT_BACKEND="django-db"
+
+# broker_connection_retry_on_startup
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP=True
+
+# This configures Redis as the datastore between Django and Celery
+CELERY_BROKER_URL=config('CELERY_BROKER_REDIS_URL', default="redis://localhost:6379")
+
+# This allows to schedule items in the Django admin
+CELERY_BEAT_SCHEDULER="django_celery_beat.schedulers.DatabaseScheduler"
